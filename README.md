@@ -1,37 +1,37 @@
 # VHAL
-VHAL - С++20 HAL library for STM32.
+VHAL - C++20 HALL library for STM32.
 
-VHAL берет на себя конфигурацию переферии, все, что нужно, это объявить в BSP нужные GPIO и переферию которая будет использщоваться на уровне приложения.
+WHALE takes over the configuration of the periphery, all that is needed is to declare in BSP the necessary GPIOs and the periphery that will be used at the application level.
 
-Следует так же понимать, что VHAL не позволяет приложению менять распиновку (альтернативные пины) они зафиксированы в BSP.
+It should also be understood that VHAL does not allow the application to change the pinout (alternative pins) they are fixed in BSP.
 
-BSP требует установить вручную на уровне LL (регистров):
-- Система
-  - Конфигурацию системы (актуально для старших версий, такие вещи как тактирование домена питания)
-  - Конфигурацию часов ядра
-  - Конфигурацию SysTick и ддобавление в прерывания обработчиков  для RTOS и `RTOS::HandleSysTickInterrupt()` и `System::TickHandler()`
+BSP requires manual installation at the LL (registers) level:
+- System
+  - System configuration (relevant for older versions, things like clocking the power domain)
+  - Kernel clock configuration
+  - SysTick configuration and adding to interrupt handlers for RTOS and `RTOS::HandleSysTickInterrupt()` and `System::TickHandler()`
 
-- Переферия (Такие как I2C, UART, TIMER... кроме GPIO)
-  - Инициализацию `EnableClock` для каждой переферии
-  - Инициализацию GPIO в Alternate Mode
-  - Инициализацию `NVIC_SetPriority` и `NVIC_EnableIRQ` если используются прерывания
+- Peripherals (Such as I2C, UART, TIMER... except GPIO)
+  - Initialization of `EnableClock` for each iteration
+  - Initializing GPIO in Alternate Mode
+  - Initialization of `NVIC_SetPriority` and `NVIC_EnableIRQ` if interrupts are used
   
-# Создание проекта в CubeIDE и CubeMX
+# Creating a project in CubуeIDE and CubeMX
   
-В качистве примера взят `STM32F412RETx`.
+As an example the following is taken `STM32F412RETx`.
 
-## Начальная настройка
-- Создайте новый проект в CubeMX и настройте стандартные вещи, такие как тактирование и вклдючение SW отладки (SYS ->Debug -> Serial Wire)
-- В качестве Timebase Sourse (SYS -> Timebase Sourse) используйте SysTick. Можно так же использовать таймер по своему желанию, но убедитесь, что он инициализируется первым поскольку некоторые адаптеры VHAL используют `System::TickHandler()` для инициализации (ADC может использовать задержку чтобы иметь время правильно откалиброваться)
-- Включите FreeRTOS во вкладке Mindware, версия CMSYS не имеет значение, нам нужен только файл FreeRtos и чтобы проект сгенерировался с учетом того, что будет использоваться RTOS. Этот шаг так же можно пропустить, но множество драйверов и утилит используют RTOSAdapter, будьте осторожны.
+## Initial setup
+- Create a new project in CubeMX and configure standard things such as clocking and enabling SW debugging (SYS ->Debug -> Serial Wire)
+-  Use Sytick as Timebase Sourse (SYS -> Timebase Sourse). You can also use the timer as you wish, but make sure it initializes first because some VHAL adapters use `System::TickHandler()` for initialization (ADC can use a delay to have time to calibrate correctly)
+- Enable FreeRTOS in the `Mindware` tab, the CMSYS version does not matter, we only need the FreeRTOS file and for the project to be generated taking into account that RTOS will be used. This step can also be skipped, but many drivers and utilities use RTOSAdapter, be careful.
 
-## Настройка переферии
-- Активируйте нужную вам переферию и ее прерывания (в том случае, если собираетесь использовать прерывания). Больше ничего не нужно, остальнон можно настроить непосредственно из VHAL.
+## Setting up the periphery
+- Activate the peripherals in CUbeMX you need and their interrupts (if you are going to use interrupts). Nothing else is needed, the rest can be configured directly from VHAL.
 
-## Генерацция проекта
-- Перейдите во вкладку `Project Manager` -> и выберете `Toolchain / IDE` -> `STM32CubeIDE`
-- Во вкладке `Project Manager` -> `Advenced Settings` выберете каждую переферию и смените `HAL` на `LL` (поскольку VHAL использует LL)
-- Нажмите кнопку `Generate Code` (если CubeMX спросит, уверены ли вы, что хотите использовать SysTick то нажмите - да)
+## Project generation
+-Go to the `Project Manager` tab -> and select `Toolchain / IDE' -> `STM32CubeIDE`
+- In the `Project Manager` tab -> `Advanced Settings`, select each peripheral and change `HAL` to `LL` (since VHAL uses LL)
+- Click the `Generate Code` button (if CubeMX asks if you are sure you want to use Sytick - click yes)
 
 # Create VHAL Project
 - Duplicate the newly generated project, it will be used as a code donor
@@ -81,43 +81,43 @@ BSP требует установить вручную на уровне LL (р�
    ```
 
 ## Config VHAL Project base
-Откройте проект-донор чтобы копировать от туда конфигурации. В дальнейшем, если нужно будет добавить новую переферию или изменить существующую, используйте CubeMX чтобы перегенерировать проект-донор и скопировать конфигурации по инструкциям ниже.
+Open a donor project to copy configurations from there. In the future, if you need to add a new peripheral or modify an existing one, use CubeMX to regenerate the donor project and copy the configurations according to the instructions below.
 
-- Откройте файл (донор) `Core\Inc\main.h` и скопируйте все include и PRIORITYGROUP (если они есть) в `BSP/Periphery.h` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/Periphery.h))
-- Адаптеры
-  - Откройте `BSP/PortAdapters.h` и добавьте include адаптеров используемой переферии для вашей серии STM32 в формате `#include <Adapter/Port/F_X_/_PERIPHERY_AdapterF_X_.h>` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/PortAdapters.h))
-    - Обратите внимание, что у вас будет ошибка компиляции если вы добавите адаптеры той переферии, которую не выбрали в CubeMX поскольку CubeMX генерирует файлы LL библиотек только для той переферии, которая активирована.
-- Прерывания (этот шаг необязательный и только для ознакомления поскольку в шаблоне уже написан нужный код)
-  - Откройте файл (донор) `Core\Inc\stm32f4xx_it.h` (название может отличатся от серии STM32) и скопируйте functions prototypes в `BSP/IRQ/SystemIrq.h` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.h))
-  - Откройте файл (донор) `Core\Src\stm32f4xx_it.c` (название может отличатся от серии STM32) и скопируйте Exception Handlers в `BSP/IRQ/SystemIrq.cpp` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.cpp))
-  Добавьте в `SysTick_Handler` обработчики для `RTOS` и `System` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.cpp#L45)):
+- Open the file (donor) `Core\Inc\main.h` and copy all include and PRIORITYGROUP (if any) to `BSP/Periphery.h` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/Periphery.h))
+- Adapters
+  -Open `BSP/Port Adapters.h` and add include adapters of the used peripherals for your STM32 series in the format `#include <Adapter/Port/F_X_/_PERIPHERY_AdapterF_X_.h>` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/PortAdapters.h))
+    - Please note that you will have a compilation error if you add adapters to the peripherals that you did not select in CubeMX because CubeMX generates LL library files only for the peripherals that are activated.
+- Interrupts (this step is optional and only for familiarization since the necessary code has already been written in the template)
+  - Open the file (donor) `Core\Inc\stm32f4xx_it.h` (the name may differ from the STM32 series) and copy functions prototypes to `BSP/IRQ/SystemIrq.h` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.h))
+  - Open the file (donor) `Core\Src\stm32f4xx_it.c` (the name may differ from the STM32 series) and copy Exception Handlers to `BSP/IRQ/SystemIrq.cpp` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.cpp))
+ Add handlers for `RTOS` and `System` to `SysTick_Handler` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.cpp#L45)):
   
     ```c++
     System::TickHandler();
     OSAdapter::RTOS::HandleSysTickInterrupt();
     ```
-  В случае исли вы используете вместо SysTick таймер, следует добавить код туда.
-- Система
-  -  Откройте файл (донор) `Core\Src\main.c`
-    - В функции `int main(void)` до вызова `SystemClock_Config()` в некоторых версиях STM32 существует MCU Configuration, код в `BSP/BSP.cpp` -> `BSP::InitSystem()` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L11)). Если у вас нет этого кода, то пропустите этот шаг.
-    - В функции `void SystemClock_Config(void)` скопируйте все содержимое в `BSP/BSP.cpp` -> `BSP::InitClock()` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L30))
-      - CubeMX использует [LL_Init1msTick](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L56) для конфигурации частоты прерывания `SysTick_Handler`, но мы уже используем [BSP::InitSystemTick](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L65), так что строку с `LL_Init1msTick` можно закоментировать, либо вставить ее в `BSP::InitSystemTick` по вашему усмотрению.
+  If you use a timer instead of a SysTick, you should add the code there.
+- System
+  -  Open the file (donor) `Core\Src\main.c`
+    -In the function `int main(void)` before calling `SystemClock_Config()`, there is an MCU Configuration in some versions of STM32, add the code from there to `BSP/BSP.cpp` -> `BSP::InitSystem()`([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L11)). If you don't have this code, then skip this step.
+    - In the `void SystemClock_Config(void)` function copy all the contents to `BSP/BSP.cpp` -> `BSP::InitClock()` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L30))
+      - CubeMX uses [LL_Init1msTick](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L56) to configure the interrupt frequency `SysTick_Handler', but we already use [BSP::InitSystemTick](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L65), so the line with `LL_Init1msTick` can be commented out, or inserted into `BSP::InitSystemTick` at your discretion.
 
-На этом этапе проект уже должен успешно компилироваться и работать.
+At this stage, the project should already be successfully compiled and running.
 
 ## Config VHAL Project periphery
-Для примера мы будем использовать UART, если вы не включили его в проект то это отличная возможность потренироваться.
+For example, we will use UART, if you have not included it in the project, then this is a great opportunity to practice.
 
-В случае, если вы решили добавить совершенно новую переферю:
-- Включите UART с прерываниями в проекте-доноре и после запустите генератор CubeMX. (не забудьте сменить `HAL` на `LL` во вкладке `Project Manager` -> `Advenced Settings`)
-- Скопируйте новые библиотеки которые лежат в папке `Drivers/STM32F4xx_HAL_Driver` (название может отличатся от серии STM32)
-  - (advice) Легче всего просто скопировать всю папку `Drivers` из донор-проекта в оригинальный проект с заменой.
-- Добавьте новый include вашей переферии в `BSP/PortAdapters.h`
+In case you decide to add a completely new periphery:
+-  Enable UART with interrupts in the donor project and then run the CubeMX generator. (don't forget to change `HAL` to `LL` in the `Project Manager` tab -> `Advenced Settings`)
+- Copy the new libraries that are in the folder `Drivers/STM32F4xx_HAL_Driver` (the name may differ from the STM32 series)
+  - (The easiest way is to simply copy the entire `Drivers` folder from the donor project to the original project with a replacement.
+- Add a new include of your periphery to `BSP/PortAdapters.h`
 
-### Добавление GPIO:
+### Adding GPIO
 
-Простые GPIO добавлять крайне просто.
-- Откройте `BSP/BSP.h` и создайте `public` переменную `static AGPIO` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.h#L10))
+Adding regular GPIOs is extremely simple.
+- Open `BSP/BSP.h` and create a `public` variable `static AGPIO` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.h#L10))
 
   ```c++
   class BSP {
@@ -126,22 +126,22 @@ BSP требует установить вручную на уровне LL (р�
     ...
     static AGPIO ledPin;
   ```
-- Откройте `BSP/BSP.cpp` и объявите вашу переменную ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L6))
+- Open `BSP/BSP.cpp` and declare your variable ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L6))
 
   ```c++
-  AGPIO BSP::ledPin	= { GPIOC, 6 };
+  AGPIO BSP::ledPin = { GPIOC, 6 };
   ```
-  В данном случае это GPIOC6. Если вы хотите чтобы при установке пина его сигнал был низким (инверсная логика) то можете объявить его так:
+  In this case, it is GPIO6. If you want its signal to be low when set (inverse logic), then you can declare it like this:
   
   ```c++
   AGPIO BSP::ledPin	= { GPIOC, 6, true };
   ```
-  3 необязательный параметр задает, используется ли инверсная логика, по дефолту это `false`
+  3 optional parameter specifies whether inverse logic is used, by default it is `false`
   
-### Добавление другой переферии:
+### Adding another periphery
 
-Для примера используется UART. 
-- Откройте `BSP/BSP.h` и создайте `public` переменную `static AUART` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.h#L8))
+For example UART is used.
+- Open `BSP/BSP.h` and create a `public` variable `static AUART` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.h#L8))
 
   ```c++
   class BSP {
@@ -150,29 +150,29 @@ BSP требует установить вручную на уровне LL (р�
     ...
     static AUART consoleSerial;
   ```
-- Откройте `BSP/BSP.cpp` и объявите вашу переменную ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L4))
+- Open it `BSP/BSP.cpp ` and declare your variable ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L4))
 
   ```c++
   AUART BSP::consoleSerial = { USART1 };
   ```
-  В данном случае используется `USART1`, но у вас может быть другой.
-- Откройте файл (донор) `Core\Src\main.c` и найдите вашу функцию инициализации UART, например `void MX_USART1_UART_Init()`
-  Вам нужно только функция включения часов UART и GPIO на которых он будет работать.
-  - Найдите в `void MX_USART1_UART_Init()` peripheral clock enable, в данном случае это:
+  In this case, `USART1` is used, but you may have another one.
+- Open the file (donor) `Core\Src\main.c` and find your UART initialization function, for example `void MX_USART1_UART_Init()`
+  You only need the function of enabling the UART clock and GPIO on which it will run.
+  - Find in `void MX_USART1_UART_Init()` peripheral clock enable, in this case it is:
   
     ```c++
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART2);
     ```
-  Обратите внимаение, что peripheral clock enable для GPIO вам не нужен, он будет включен автоматически VHAL.
-  - Найдите в `void MX_USART1_UART_Init()` interrupt Init, в данном случае это:
-    (этот шаг можно пропустить если вы не используете прерывания) 
+  Note that you don't need the peripheral clock enable for GPIO, it will be enabled automatically by VHAL.
+  - Find in `void MX_USART1_UART_Init()` interrupt Init, in this case it is:
+    (you can skip this step if you don't use interrupts)
     
     ```c++
     /* USART1 interrupt Init */
     NVIC_SetPriority(USART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
     NVIC_EnableIRQ(USART1_IRQn);
     ```
-  - Найдите UART GPIO Configuration и запомните GPIO и их Alternate Mode
+  - Find the UART GPIO Configuration and remember GPIOs and their Alternate Mode
     ```c++
     /** USART1 GPIO Configuration
         PA7   ------> USART1_TX
@@ -186,8 +186,8 @@ BSP требует установить вручную на уровне LL (р�
     GPIO_InitStruct.Alternate = LL_GPIO_AF_7;
     LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
     ```
-  В данном случае это `PA7` и `PA10`, оба используют 7 Alternate Mode (`GPIO_InitStruct.Alternate = LL_GPIO_AF_7;`)
-- Откройте `BSP/BSP.cpp` и добавьте в `BSP::InitAdapterPeripheryEvents()` событие `beforePeripheryInit` для вашей перменной ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L76)):
+  In this case it's `PA7` and `PA10`, both use 7 Alternative Mode (`GPIO_Init Struct.Alternative = LL_GPIO_AF_7;`)
+- Open it `BSP/BSP.cpp` and add to `BSP::InitAdapterPeripheryEvents()` the `beforePeripheryInit` event for your perm ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L76)):
 
   ```c++
 	consoleSerial.beforePeripheryInit = []() {
@@ -202,16 +202,16 @@ BSP требует установить вручную на уровне LL (р�
 		return Status::ok;
 	};
   ```
-  `EnableClock`, `SetPriority`, `EnableIRQ` копируются из проекта-донора, для GPIO есть удобный интерфейс `AGPIO::AlternateInit`
-- И наконец-то, если вы используете прерывания, добавьте обработчик прерываний в BSP
-  - Откройте файл (донор) `Core\Inc\stm32f4xx_it.h` (название может отличатся от серии STM32) и скопируйте functions prototypes в `BSP/IRQ/DeviceIrq.h` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/DeviceIrq.h#L7))
-  - Откройте файл (донор) `Core\Src\stm32f4xx_it.c` (название может отличатся от серии STM32) и скопируйте Exception Handlers в `BSP/IRQ/DeviceIrq.cpp` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/DeviceIrq.cpp#L9))
+  `EnableClock`, `SetPriority`, `EnableIRQ` copied from a donor project, there is a convenient interface for GPIO `AGPIO::AlternateInit`
+- And finally, if you use interrupts, add an interrupt handler to BSP
+  - Open the file (donor) `Core\Inc\stm32f4xx_it.h` (the name may differ from the STM32 series) and copy functions prototypes to `BSP/IRQ/DeviceIrq.h` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/DeviceIrq.h#L7))
+  - Open the file (donor) `Core\Src\stm32f4xx_it.c` (the name may differ from the STM32 series) and copy Exception Handlers to `BSP/IRQ/DeviceIrq.cpp` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/DeviceIrq.cpp#L9))
   
-  После добавьте обработчик VHAL для вашего UART:
+  Then add a VHAL handler for your UART:
   
   ```c++
   BSP::consoleSerial.IrqHandler();
   ```
   
-# Готово
-Вы создали проект и сконфигурировали BSP, теперь вы можете использовать вашу переферию, о том, как ее конфигурировать на верхнем уровне можно почитать в документации к [VHAL](https://github.com/VeyDlin/VHAL)
+# Done
+You have created a project and configured BSP, now you can use your peripherals, you can read about how to configure it at the top level in the documentation for [VHAL](https://github.com/VeyDlin/VHAL)
