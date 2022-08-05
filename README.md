@@ -134,7 +134,7 @@ Adding regular GPIOs is extremely simple.
   In this case, it is GPIO6. If you want its signal to be low when set (inverse logic), then you can declare it like this:
   
   ```c++
-  AGPIO BSP::ledPin	= { GPIOC, 6, true };
+  AGPIO BSP::ledPin = { GPIOC, 6, true };
   ```
   3 optional parameter specifies whether inverse logic is used, by default it is `false`
   
