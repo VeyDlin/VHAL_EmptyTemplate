@@ -90,12 +90,12 @@ BSP требует установить вручную на уровне LL (р�
 - Прерывания (этот шаг необязательный и только для ознакомления поскольку в шаблоне уже написан нужный код)
   - Откройте файл (донор) `Core\Inc\stm32f4xx_it.h` (название может отличатся от серии STM32) и скопируйте functions prototypes в `BSP/IRQ/SystemIrq.h` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.h))
   - Откройте файл (донор) `Core\Src\stm32f4xx_it.c` (название может отличатся от серии STM32) и скопируйте Exception Handlers в `BSP/IRQ/SystemIrq.cpp` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.cpp))
-  Добавьте в `SysTick_Handler` обработчики для `RTOS` и `System` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.cpp#L45))
+  Добавьте в `SysTick_Handler` обработчики для `RTOS` и `System` ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.cpp#L45)):
   
-  ```c++
-  System::TickHandler();
-	OSAdapter::RTOS::HandleSysTickInterrupt();
-  ```
+    ```c++
+    System::TickHandler();
+    OSAdapter::RTOS::HandleSysTickInterrupt();
+    ```
   В случае исли вы используете вместо SysTick таймер, следует добавить код туда.
 - Система
   -  Откройте файл (донор) `Core\Src\main.c`
@@ -160,32 +160,32 @@ BSP требует установить вручную на уровне LL (р�
   Вам нужно только функция включения часов UART и GPIO на которых он будет работать.
   - Найдите в `void MX_USART1_UART_Init()` peripheral clock enable, в данном случае это:
   
-  ```c++
-  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART2);
-  ```
+    ```c++
+    LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART2);
+    ```
   Обратите внимаение, что peripheral clock enable для GPIO вам не нужен, он будет включен автоматически VHAL.
   - Найдите в `void MX_USART1_UART_Init()` interrupt Init, в данном случае это:
     (этот шаг можно пропустить если вы не используете прерывания) 
     
-  ```c++
-  /* USART1 interrupt Init */
-  NVIC_SetPriority(USART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
-  NVIC_EnableIRQ(USART1_IRQn);
-  ```
+    ```c++
+    /* USART1 interrupt Init */
+    NVIC_SetPriority(USART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+    NVIC_EnableIRQ(USART1_IRQn);
+    ```
   - Найдите UART GPIO Configuration и запомните GPIO и их Alternate Mode
-  ```c++
-  /** USART1 GPIO Configuration
-      PA7   ------> USART1_TX
-      PA10   ------> USART1_RX
-  */
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_2 | LL_GPIO_PIN_3;
-  GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-  GPIO_InitStruct.Alternate = LL_GPIO_AF_7;
-  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-  ```
+    ```c++
+    /** USART1 GPIO Configuration
+        PA7   ------> USART1_TX
+        PA10   ------> USART1_RX
+    */
+    GPIO_InitStruct.Pin = LL_GPIO_PIN_2 | LL_GPIO_PIN_3;
+    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+    GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    GPIO_InitStruct.Alternate = LL_GPIO_AF_7;
+    LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    ```
   В данном случае это `PA7` и `PA10`, оба используют 7 Alternate Mode (`GPIO_InitStruct.Alternate = LL_GPIO_AF_7;`)
 - Откройте `BSP/BSP.cpp` и добавьте в `BSP::InitAdapterPeripheryEvents()` событие `beforePeripheryInit` для вашей перменной ([пример](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L76)):
 
