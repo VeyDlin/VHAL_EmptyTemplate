@@ -1,7 +1,7 @@
 # VHAL
 VHAL - C++20 HALL library for STM32.
 
-WHALE takes over the configuration of the periphery, all that is needed is to declare in BSP the necessary GPIOs and the periphery that will be used at the application level.
+WHAL takes over the configuration of the periphery, all that is needed is to declare in BSP the necessary GPIOs and the periphery that will be used at the application level.
 
 It should also be understood that VHAL does not allow the application to change the pinout (alternative pins) they are fixed in BSP.
 
