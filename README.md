@@ -99,9 +99,9 @@ Open a donor project to copy configurations from there. In the future, if you ne
   If you use a timer instead of a SysTick, you should add the code there.
 - System
   -  Open the file (donor) `Core/Src/main.c`
-    -In the function `int main(void)` before calling `SystemClock_Config()`, there is an MCU Configuration in some versions of STM32, add the code from there to `BSP/BSP.cpp` -> `BSP::InitSystem()`([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L11)). If you don't have this code, then skip this step.
+    - In the function `int main(void)` before calling `SystemClock_Config()`, there is an MCU Configuration in some versions of STM32, add the code from there to `BSP/BSP.cpp` -> `BSP::InitSystem()`([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L11)). If you don't have this code, then skip this step.
     - In the `void SystemClock_Config(void)` function copy all the contents to `BSP/BSP.cpp` -> `BSP::InitClock()` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L30))
-      - CubeMX uses [LL_Init1msTick](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L56) to configure the interrupt frequency `SysTick_Handler', but we already use [BSP::InitSystemTick](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L65), so the line with `LL_Init1msTick` can be commented out, or inserted into `BSP::InitSystemTick` at your discretion.
+      - CubeMX uses [LL_Init1msTick](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L56) to configure the interrupt frequency `SysTick_Handler`, but we already use [BSP::InitSystemTick](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L65), so the line with `LL_Init1msTick` can be commented out, or inserted into `BSP::InitSystemTick` at your discretion.
 
 At this stage, the project should already be successfully compiled and running.
 
