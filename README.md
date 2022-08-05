@@ -18,7 +18,7 @@ BSP requires manual installation at the LL (registers) level:
   
 # Creating a project in CubуeIDE and CubeMX
   
-As an example the following is taken `STM32F412RETx`.
+As an example the following is taken `STM32F412RETx`
 
 ## Initial setup
 - Create a new project in CubeMX and configure standard things such as clocking and enabling SW debugging (SYS ->Debug -> Serial Wire)
@@ -29,9 +29,9 @@ As an example the following is taken `STM32F412RETx`.
 - Activate the peripherals in CUbeMX you need and their interrupts (if you are going to use interrupts). Nothing else is needed, the rest can be configured directly from VHAL.
 
 ## Project generation
--Go to the `Project Manager` tab -> and select `Toolchain / IDE' -> `STM32CubeIDE`
+- Go to the `Project Manager` tab -> and select `Toolchain / IDE` -> `STM32CubeIDE`
 - In the `Project Manager` tab -> `Advanced Settings`, select each peripheral and change `HAL` to `LL` (since VHAL uses LL)
-- Click the `Generate Code` button (if CubeMX asks if you are sure you want to use Sytick - click yes)
+- Click the `Generate Code` button (if CubeMX asks if you are sure you want to use Sytick - click `yes`)
 
 # Create VHAL Project
 - Duplicate the newly generated project, it will be used as a code donor
@@ -83,13 +83,13 @@ As an example the following is taken `STM32F412RETx`.
 ## Config VHAL Project base
 Open a donor project to copy configurations from there. In the future, if you need to add a new peripheral or modify an existing one, use CubeMX to regenerate the donor project and copy the configurations according to the instructions below.
 
-- Open the file (donor) `Core\Inc\main.h` and copy all include and PRIORITYGROUP (if any) to `BSP/Periphery.h` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/Periphery.h))
+- Open the file (donor) `Core/Inc/main.h` and copy all include and PRIORITYGROUP (if any) to `BSP/Periphery.h` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/Periphery.h))
 - Adapters
-  -Open `BSP/Port Adapters.h` and add include adapters of the used peripherals for your STM32 series in the format `#include <Adapter/Port/F_X_/_PERIPHERY_AdapterF_X_.h>` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/PortAdapters.h))
+  -Open `BSP/PortAdapters.h` and add include adapters of the used peripherals for your STM32 series in the format `#include <Adapter/Port/F_X_/_PERIPHERY_AdapterF_X_.h>` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/PortAdapters.h))
     - Please note that you will have a compilation error if you add adapters to the peripherals that you did not select in CubeMX because CubeMX generates LL library files only for the peripherals that are activated.
 - Interrupts (this step is optional and only for familiarization since the necessary code has already been written in the template)
-  - Open the file (donor) `Core\Inc\stm32f4xx_it.h` (the name may differ from the STM32 series) and copy functions prototypes to `BSP/IRQ/SystemIrq.h` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.h))
-  - Open the file (donor) `Core\Src\stm32f4xx_it.c` (the name may differ from the STM32 series) and copy Exception Handlers to `BSP/IRQ/SystemIrq.cpp` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.cpp))
+  - Open the file (donor) `Core/Inc/stm32f4xx_it.h` (the name may differ from the STM32 series) and copy functions prototypes to `BSP/IRQ/SystemIrq.h` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.h))
+  - Open the file (donor) `Core/Src/stm32f4xx_it.c` (the name may differ from the STM32 series) and copy Exception Handlers to `BSP/IRQ/SystemIrq.cpp` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.cpp))
  Add handlers for `RTOS` and `System` to `SysTick_Handler` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/SystemIrq.cpp#L45)):
   
     ```c++
@@ -98,7 +98,7 @@ Open a donor project to copy configurations from there. In the future, if you ne
     ```
   If you use a timer instead of a SysTick, you should add the code there.
 - System
-  -  Open the file (donor) `Core\Src\main.c`
+  -  Open the file (donor) `Core/Src/main.c`
     -In the function `int main(void)` before calling `SystemClock_Config()`, there is an MCU Configuration in some versions of STM32, add the code from there to `BSP/BSP.cpp` -> `BSP::InitSystem()`([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L11)). If you don't have this code, then skip this step.
     - In the `void SystemClock_Config(void)` function copy all the contents to `BSP/BSP.cpp` -> `BSP::InitClock()` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L30))
       - CubeMX uses [LL_Init1msTick](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L56) to configure the interrupt frequency `SysTick_Handler', but we already use [BSP::InitSystemTick](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/BSP.cpp#L65), so the line with `LL_Init1msTick` can be commented out, or inserted into `BSP::InitSystemTick` at your discretion.
@@ -156,7 +156,7 @@ For example UART is used.
   AUART BSP::consoleSerial = { USART1 };
   ```
   In this case, `USART1` is used, but you may have another one.
-- Open the file (donor) `Core\Src\main.c` and find your UART initialization function, for example `void MX_USART1_UART_Init()`
+- Open the file (donor) `Core/Src/main.c` and find your UART initialization function, for example `void MX_USART1_UART_Init()`
   You only need the function of enabling the UART clock and GPIO on which it will run.
   - Find in `void MX_USART1_UART_Init()` peripheral clock enable, in this case it is:
   
@@ -204,8 +204,8 @@ For example UART is used.
   ```
   `EnableClock`, `SetPriority`, `EnableIRQ` copied from a donor project, there is a convenient interface for GPIO `AGPIO::AlternateInit`
 - And finally, if you use interrupts, add an interrupt handler to BSP
-  - Open the file (donor) `Core\Inc\stm32f4xx_it.h` (the name may differ from the STM32 series) and copy functions prototypes to `BSP/IRQ/DeviceIrq.h` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/DeviceIrq.h#L7))
-  - Open the file (donor) `Core\Src\stm32f4xx_it.c` (the name may differ from the STM32 series) and copy Exception Handlers to `BSP/IRQ/DeviceIrq.cpp` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/DeviceIrq.cpp#L9))
+  - Open the file (donor) `Core/Inc/stm32f4xx_it.h` (the name may differ from the STM32 series) and copy functions prototypes to `BSP/IRQ/DeviceIrq.h` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/DeviceIrq.h#L7))
+  - Open the file (donor) `Core/Src/stm32f4xx_it.c` (the name may differ from the STM32 series) and copy Exception Handlers to `BSP/IRQ/DeviceIrq.cpp` ([example](https://github.com/VeyDlin/VHAL_Template/blob/main/BSP/IRQ/DeviceIrq.cpp#L9))
   
   Then add a VHAL handler for your UART:
   
