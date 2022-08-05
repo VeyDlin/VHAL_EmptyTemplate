@@ -16,7 +16,7 @@ BSP requires manual installation at the LL (registers) level:
   - Initializing GPIO in Alternate Mode
   - Initialization of `NVIC_SetPriority` and `NVIC_EnableIRQ` if interrupts are used
   
-# Creating a project in CubуeIDE and CubeMX
+# Creating a project in CubeIDE and CubeMX
   
 As an example the following is taken `STM32F412RETx`
 
