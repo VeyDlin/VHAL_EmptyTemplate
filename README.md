@@ -45,7 +45,7 @@ As an example the following is taken `STM32F412RETx`
 - `Right mouse button` -> `Properties` 
   - `C/C++ Build`
     - (advice) tab `Behavior` -> `Enable Parallel Build` and `Use unlimited jobs`
-    - (advice) `Settings` -> `MCU GCC Compiler` -> `Geniral` -> `Standart` -> GNU18 (Update the cube if you don't have GNU++20)
+    - (advice) `Settings` -> `MCU GCC Compiler` -> `Geniral` -> `Standart` -> GNU18 (Update the cube if you don't have GNU18)
     - `Settings` -> `MCU G++ Compiler` -> `Geniral` -> `Standart` -> GNU++20 (Update the cube if you don't have GNU++20)
   - `C/C++ Geniral` -> `Path and Symbols`
     - `Includes` -> ... (`Add to all configurations` and `Add to all languages`)
